@@ -29,11 +29,7 @@
       --current-surface: var(--study-surface);
     }
 
-    html, body {
-      height: 100%;
-      min-height: 100svh;
-      overflow: hidden;
-    }
+    html { min-height: 100svh; }
 
     body {
       font-family: 'DM Mono', monospace;
@@ -41,414 +37,36 @@
       color: var(--current-text);
       transition: background 0.8s ease, color 0.8s ease;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
-      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      min-height: 100svh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: max(env(safe-area-inset-top), 20px) env(safe-area-inset-right) max(env(safe-area-inset-bottom), 20px) env(safe-area-inset-left);
       position: relative;
     }
 
-    /* Noise texture overlay */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.5;
+      pointer-events: none; z-index: 0; opacity: 0.5;
     }
 
-    /* Ambient glow */
     body::after {
       content: '';
       position: fixed;
-      width: 60vmax;
-      height: 60vmax;
+      width: 60vmax; height: 60vmax;
       border-radius: 50%;
       background: radial-gradient(circle, var(--current-accent) 0%, transparent 70%);
       opacity: 0.04;
-      top: 50%;
-      left: 50%;
+      top: 50%; left: 50%;
       transform: translate(-50%, -60%);
-      pointer-events: none;
-      z-index: 0;
+      pointer-events: none; z-index: 0;
       transition: background 0.8s ease;
     }
 
-    .container {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 380px;
-      padding: 24px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    /* Header */
-    .header {
-      text-align: center;
-    }
-
-    .mode-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--current-accent);
-      transition: color 0.8s ease;
-      margin-bottom: 4px;
-    }
-
-    .app-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: 28px;
-      color: var(--current-text);
-      transition: color 0.8s ease;
-    }
-
-    /* Time Input Section */
-    .input-section {
-      background: var(--current-surface);
-      border-radius: var(--radius);
-      padding: 20px;
-      border: 1px solid rgba(255,255,255,0.06);
-      transition: background 0.8s ease, border-color 0.8s ease;
-    }
-
-    .input-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 0;
-    }
-
-    .input-row + .input-row {
-      border-top: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .input-label {
-      font-size: 11px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--current-muted);
-      transition: color 0.8s ease;
-    }
-
-    .time-input-group {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .time-field {
-      width: 48px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      color: var(--current-text);
-      font-family: 'DM Mono', monospace;
-      font-size: 16px;
-      font-weight: 500;
-      text-align: center;
-      padding: 8px 4px;
-      outline: none;
-      -webkit-appearance: none;
-      transition: border-color 0.3s, background 0.3s;
-    }
-
-    .time-field:focus {
-      border-color: var(--current-accent);
-      background: rgba(255,255,255,0.08);
-    }
-
-    .time-sep {
-      font-size: 14px;
-      color: var(--current-muted);
-      font-weight: 300;
-    }
-
-    .time-unit {
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      color: var(--current-muted);
-      transition: color 0.8s ease;
-    }
-
-    /* Timer Display */
-    .timer-display {
-      text-align: center;
-      padding: 10px 0;
-      position: relative;
-    }
-
-    .timer-ring-wrap {
-      position: relative;
-      width: 220px;
-      height: 220px;
-      margin: 0 auto;
-    }
-
-    .timer-svg {
-      width: 220px;
-      height: 220px;
-      transform: rotate(-90deg);
-    }
-
-    .ring-track {
-      fill: none;
-      stroke: rgba(255,255,255,0.05);
-      stroke-width: 3;
-    }
-
-    .ring-progress {
-      fill: none;
-      stroke: var(--current-accent);
-      stroke-width: 3;
-      stroke-linecap: round;
-      stroke-dasharray: 628;
-      stroke-dashoffset: 0;
-      transition: stroke-dashoffset 1s linear, stroke 0.8s ease;
-      filter: drop-shadow(0 0 6px var(--current-accent));
-    }
-
-    .timer-inner {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .timer-digits {
-      font-family: 'DM Serif Display', serif;
-      font-size: 52px;
-      line-height: 1;
-      color: var(--current-text);
-      letter-spacing: -0.02em;
-      transition: color 0.8s ease;
-    }
-
-    .timer-sub {
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      color: var(--current-muted);
-      margin-top: 6px;
-      text-transform: uppercase;
-      transition: color 0.8s ease;
-    }
-
-    /* Controls */
-    .controls {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .btn-main {
-      width: 100%;
-      padding: 18px;
-      border: none;
-      border-radius: var(--radius);
-      font-family: 'DM Mono', monospace;
-      font-size: 13px;
-      font-weight: 500;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      cursor: pointer;
-      background: var(--current-accent);
-      color: #0a0a0c;
-      transition: transform 0.15s ease, opacity 0.15s ease, background 0.8s ease;
-      -webkit-tap-highlight-color: transparent;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-main::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(255,255,255,0.15);
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-
-    .btn-main:active::after { opacity: 1; }
-    .btn-main:active { transform: scale(0.97); }
-
-    .btn-secondary {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: var(--radius);
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      font-weight: 400;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      cursor: pointer;
-      background: transparent;
-      color: var(--current-muted);
-      transition: color 0.3s, border-color 0.3s, transform 0.15s;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .btn-secondary:active { transform: scale(0.97); }
-
-    /* Choice overlay */
-    .choice-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.4s ease;
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-
-    .choice-overlay.visible {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .choice-card {
-      width: 100%;
-      max-width: 380px;
-      background: #1a1a1e;
-      border-radius: 28px 28px 0 0;
-      padding: 32px 24px 40px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      transform: translateY(100%);
-      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .choice-overlay.visible .choice-card {
-      transform: translateY(0);
-    }
-
-    .choice-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: 22px;
-      text-align: center;
-      color: #e8e8e0;
-      margin-bottom: 6px;
-    }
-
-    .choice-sub {
-      font-size: 11px;
-      letter-spacing: 0.15em;
-      color: #4a4a52;
-      text-align: center;
-      text-transform: uppercase;
-      margin-bottom: 28px;
-    }
-
-    .choice-buttons {
-      display: flex;
-      gap: 12px;
-    }
-
-    .choice-btn {
-      flex: 1;
-      padding: 20px 12px;
-      border: none;
-      border-radius: 18px;
-      font-family: 'DM Mono', monospace;
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      transition: transform 0.15s, opacity 0.15s;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .choice-btn:active { transform: scale(0.95); }
-
-    .choice-btn.study {
-      background: #c8f07a;
-      color: #0a0a0c;
-    }
-
-    .choice-btn.rest {
-      background: #7ab8f0;
-      color: #0a0a0c;
-    }
-
-    .choice-icon {
-      font-size: 26px;
-      line-height: 1;
-    }
-
-    /* Session log */
-    .session-log {
-      background: var(--current-surface);
-      border-radius: var(--radius);
-      padding: 16px 20px;
-      border: 1px solid rgba(255,255,255,0.04);
-      transition: background 0.8s ease;
-      max-height: 100px;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .log-title {
-      font-size: 9px;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--current-muted);
-      margin-bottom: 10px;
-      transition: color 0.8s ease;
-    }
-
-    .log-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 11px;
-      color: var(--current-muted);
-      padding: 3px 0;
-      transition: color 0.8s ease;
-    }
-
-    .log-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      margin-right: 8px;
-      flex-shrink: 0;
-    }
-
-    .log-dot.study { background: #c8f07a; }
-    .log-dot.rest { background: #7ab8f0; }
-
-    .log-left {
-      display: flex;
-      align-items: center;
-    }
-
-    .log-empty {
-      font-size: 11px;
-      color: var(--current-muted);
-      text-align: center;
-      padding: 4px 0;
-      transition: color 0.8s ease;
-    }
-
-    /* Mode transition */
     body.rest-mode {
       --current-bg: var(--rest-bg);
       --current-accent: var(--rest-accent);
@@ -457,87 +75,603 @@
       --current-surface: var(--rest-surface);
     }
 
-    /* Pulse animation when running */
     @keyframes pulse-glow {
       0%, 100% { opacity: 0.04; }
-      50% { opacity: 0.08; }
+      50% { opacity: 0.09; }
+    }
+    body.running::after { animation: pulse-glow 3s ease-in-out infinite; }
+
+    /* ── Login Screen ── */
+    #loginScreen {
+      position: fixed; inset: 0; z-index: 200;
+      background: #0d0d0f;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 0;
+      padding: 40px 24px;
     }
 
-    body.running::after {
-      animation: pulse-glow 3s ease-in-out infinite;
+    #loginScreen::before {
+      content: '';
+      position: absolute;
+      width: 50vmax; height: 50vmax;
+      border-radius: 50%;
+      background: radial-gradient(circle, #c8f07a 0%, transparent 70%);
+      opacity: 0.05;
+      top: 30%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
     }
 
-    /* Notification badge */
-    .finished-badge {
-      display: inline-block;
-      background: var(--current-accent);
-      color: #0a0a0c;
+    .login-inner {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 320px;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+
+    .login-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 34px;
+      color: #e8e8e0;
+      text-align: center;
+      line-height: 1.1;
+    }
+
+    .login-sub {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #4a4a52;
+      text-align: center;
+    }
+
+    .login-input-wrap {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+
+    .login-label {
       font-size: 10px;
-      letter-spacing: 0.1em;
-      padding: 3px 10px;
-      border-radius: 20px;
-      margin-left: 8px;
-      vertical-align: middle;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #4a4a52;
+    }
+
+    .login-input {
+      width: 100%;
+      background: #18181c;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      color: #e8e8e0;
+      font-family: 'DM Mono', monospace;
+      font-size: 16px;
+      padding: 16px 18px;
+      outline: none;
+      -webkit-appearance: none;
+      transition: border-color 0.3s;
+    }
+
+    .login-input:focus { border-color: #c8f07a; }
+
+    .login-hint {
+      font-size: 10px;
+      color: #4a4a52;
+      letter-spacing: 0.05em;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 18px;
+      border: none;
+      border-radius: 14px;
+      background: #c8f07a;
+      color: #0a0a0c;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
       font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+
+    .login-btn:active { transform: scale(0.97); }
+
+    .login-recent {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+
+    .recent-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #4a4a52;
+    }
+
+    .recent-list {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+
+    .recent-chip {
+      background: #18181c;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      color: #e8e8e0;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      padding: 7px 14px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .recent-chip:active { background: #222226; }
+
+    /* ── App ── */
+    #app { display: none; width: 100%; }
+
+    .container {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 380px;
+      padding: 16px 20px 32px;
+      display: flex; flex-direction: column; gap: 16px;
+      margin: 0 auto;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .user-badge {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--current-surface);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      padding: 6px 12px 6px 8px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
       transition: background 0.8s;
     }
+
+    .user-avatar {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: var(--current-accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 500;
+      color: #0a0a0c;
+      transition: background 0.8s;
+      flex-shrink: 0;
+    }
+
+    .user-name {
+      font-size: 12px;
+      color: var(--current-text);
+      transition: color 0.8s;
+      max-width: 100px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    .mode-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--current-accent);
+      transition: color 0.8s;
+    }
+
+    /* ── Tab bar ── */
+    .tab-bar {
+      display: flex;
+      background: var(--current-surface);
+      border-radius: 14px;
+      padding: 4px;
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: background 0.8s;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--current-muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .tab-btn.active {
+      background: var(--current-accent);
+      color: #0a0a0c;
+    }
+
+    /* ── Timer tab ── */
+    #timerTab { display: flex; flex-direction: column; gap: 16px; }
+    #historyTab { display: none; flex-direction: column; gap: 16px; }
+
+    /* ── Input section ── */
+    .input-section {
+      background: var(--current-surface);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      border: 1px solid rgba(255,255,255,0.06);
+      transition: background 0.8s, border-color 0.8s;
+    }
+
+    .input-row {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+    }
+
+    .input-row + .input-row { border-top: 1px solid rgba(255,255,255,0.05); }
+
+    .input-label {
+      font-size: 11px; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--current-muted);
+      transition: color 0.8s;
+    }
+
+    .time-input-group { display: flex; align-items: center; gap: 6px; }
+
+    .time-field {
+      width: 48px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: var(--current-text);
+      font-family: 'DM Mono', monospace;
+      font-size: 16px; font-weight: 500;
+      text-align: center; padding: 8px 4px;
+      outline: none; -webkit-appearance: none;
+      transition: border-color 0.3s, background 0.3s;
+    }
+
+    .time-field:focus { border-color: var(--current-accent); background: rgba(255,255,255,0.08); }
+    .time-sep { font-size: 14px; color: var(--current-muted); font-weight: 300; }
+    .time-unit { font-size: 10px; letter-spacing: 0.1em; color: var(--current-muted); transition: color 0.8s; }
+
+    /* ── Ring timer ── */
+    .timer-display { text-align: center; padding: 8px 0; }
+
+    .timer-ring-wrap {
+      position: relative; width: 200px; height: 200px; margin: 0 auto;
+    }
+
+    .timer-svg { width: 200px; height: 200px; transform: rotate(-90deg); }
+    .ring-track { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 3; }
+
+    .ring-progress {
+      fill: none; stroke: var(--current-accent); stroke-width: 3;
+      stroke-linecap: round; stroke-dasharray: 565; stroke-dashoffset: 0;
+      transition: stroke-dashoffset 1s linear, stroke 0.8s;
+      filter: drop-shadow(0 0 6px var(--current-accent));
+    }
+
+    .timer-inner {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+
+    .timer-digits {
+      font-family: 'DM Serif Display', serif;
+      font-size: 48px; line-height: 1;
+      color: var(--current-text); letter-spacing: -0.02em;
+      transition: color 0.8s;
+    }
+
+    .timer-sub {
+      font-size: 10px; letter-spacing: 0.2em;
+      color: var(--current-muted); margin-top: 6px;
+      text-transform: uppercase; transition: color 0.8s;
+    }
+
+    /* ── Controls ── */
+    .controls { display: flex; flex-direction: column; gap: 10px; }
+
+    .btn-main {
+      width: 100%; padding: 17px;
+      border: none; border-radius: var(--radius);
+      font-family: 'DM Mono', monospace; font-size: 13px;
+      font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
+      cursor: pointer; background: var(--current-accent); color: #0a0a0c;
+      transition: transform 0.15s, opacity 0.15s, background 0.8s;
+      -webkit-tap-highlight-color: transparent; position: relative; overflow: hidden;
+    }
+
+    .btn-main:active { transform: scale(0.97); }
+
+    .btn-secondary {
+      width: 100%; padding: 13px;
+      border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius);
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      cursor: pointer; background: transparent; color: var(--current-muted);
+      transition: color 0.3s, border-color 0.3s, transform 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-secondary:active { transform: scale(0.97); }
+
+    /* ── History tab ── */
+    .history-header {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .history-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px; color: var(--current-text); transition: color 0.8s;
+    }
+
+    .history-clear {
+      font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--current-muted); background: none; border: none;
+      cursor: pointer; font-family: 'DM Mono', monospace;
+      -webkit-tap-highlight-color: transparent;
+      transition: color 0.2s;
+    }
+
+    .history-clear:active { color: #ff6b6b; }
+
+    /* Stats row */
+    .stats-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat-card {
+      background: var(--current-surface);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 16px;
+      transition: background 0.8s;
+    }
+
+    .stat-label {
+      font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--current-muted); margin-bottom: 8px; transition: color 0.8s;
+    }
+
+    .stat-value {
+      font-family: 'DM Serif Display', serif;
+      font-size: 24px; color: var(--current-accent);
+      transition: color 0.8s; line-height: 1;
+    }
+
+    .stat-unit {
+      font-size: 10px; color: var(--current-muted);
+      margin-top: 2px; transition: color 0.8s;
+    }
+
+    /* Date group */
+    .date-group { display: flex; flex-direction: column; gap: 6px; }
+
+    .date-label {
+      font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--current-muted); padding: 4px 0; transition: color 0.8s;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .log-card {
+      background: var(--current-surface);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      border: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.8s;
+    }
+
+    .log-left { display: flex; align-items: center; gap: 10px; }
+
+    .log-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+
+    .log-dot.study { background: #c8f07a; box-shadow: 0 0 6px #c8f07a55; }
+    .log-dot.rest  { background: #7ab8f0; box-shadow: 0 0 6px #7ab8f055; }
+
+    .log-info { display: flex; flex-direction: column; gap: 2px; }
+
+    .log-type {
+      font-size: 12px; color: var(--current-text); transition: color 0.8s;
+    }
+
+    .log-dur {
+      font-size: 10px; color: var(--current-muted); transition: color 0.8s;
+    }
+
+    .log-time {
+      font-size: 11px; color: var(--current-muted); transition: color 0.8s;
+    }
+
+    .history-empty {
+      text-align: center; padding: 48px 0;
+      font-size: 12px; color: var(--current-muted);
+      letter-spacing: 0.1em; transition: color 0.8s;
+    }
+
+    /* ── Choice overlay ── */
+    .choice-overlay {
+      position: fixed; inset: 0; z-index: 100;
+      display: flex; align-items: flex-end; justify-content: center;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .choice-overlay.visible { opacity: 1; pointer-events: all; }
+
+    .choice-card {
+      width: 100%; max-width: 380px;
+      background: #1a1a1e;
+      border-radius: 28px 28px 0 0;
+      padding: 28px 24px 40px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      transform: translateY(100%);
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .choice-overlay.visible .choice-card { transform: translateY(0); }
+
+    .choice-title {
+      font-family: 'DM Serif Display', serif; font-size: 22px;
+      text-align: center; color: #e8e8e0; margin-bottom: 4px;
+    }
+
+    .choice-sub {
+      font-size: 11px; letter-spacing: 0.15em; color: #4a4a52;
+      text-align: center; text-transform: uppercase; margin-bottom: 24px;
+    }
+
+    .choice-buttons { display: flex; gap: 12px; }
+
+    .choice-btn {
+      flex: 1; padding: 20px 12px;
+      border: none; border-radius: 18px;
+      font-family: 'DM Mono', monospace; font-size: 12px;
+      font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
+      cursor: pointer; display: flex; flex-direction: column;
+      align-items: center; gap: 8px;
+      transition: transform 0.15s; -webkit-tap-highlight-color: transparent;
+    }
+
+    .choice-btn:active { transform: scale(0.95); }
+    .choice-btn.study { background: #c8f07a; color: #0a0a0c; }
+    .choice-btn.rest  { background: #7ab8f0; color: #0a0a0c; }
+    .choice-icon { font-size: 24px; line-height: 1; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <div class="mode-label" id="modeLabel">공부 모드</div>
-      <div class="app-title">집중 타이머</div>
-    </div>
 
-    <!-- Time input -->
-    <div class="input-section" id="inputSection">
-      <div class="input-row">
-        <span class="input-label">📚 공부</span>
-        <div class="time-input-group">
-          <input class="time-field" id="studyMin" type="number" min="0" max="99" value="25" inputmode="numeric" />
-          <span class="time-sep">:</span>
-          <input class="time-field" id="studySec" type="number" min="0" max="59" value="00" inputmode="numeric" />
-          <span class="time-unit">mm:ss</span>
+  <!-- ══ LOGIN SCREEN ══ -->
+  <div id="loginScreen">
+    <div class="login-inner">
+      <div style="text-align:center">
+        <div style="font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:#4a4a52;margin-bottom:10px">집중 타이머</div>
+        <div class="login-title">안녕하세요<br>누구신가요?</div>
+      </div>
+
+      <div class="login-input-wrap">
+        <div class="login-label">닉네임 입력</div>
+        <input class="login-input" id="userInput" type="text" placeholder="예: 철수, study_kim …" maxlength="20" autocomplete="off" autocorrect="off" spellcheck="false" />
+        <div class="login-hint">* 같은 닉네임을 입력하면 기록이 이어져요</div>
+      </div>
+
+      <div class="login-recent" id="recentWrap" style="display:none">
+        <div class="recent-label">최근 사용자</div>
+        <div class="recent-list" id="recentList"></div>
+      </div>
+
+      <button class="login-btn" onclick="handleLogin()">시작하기 →</button>
+    </div>
+  </div>
+
+  <!-- ══ MAIN APP ══ -->
+  <div id="app">
+    <div class="container">
+
+      <!-- Top bar -->
+      <div class="topbar">
+        <div class="user-badge" onclick="handleLogout()">
+          <div class="user-avatar" id="userAvatar">?</div>
+          <div class="user-name" id="userName">-</div>
+        </div>
+        <div class="mode-label" id="modeLabel">공부 모드</div>
+      </div>
+
+      <!-- Tab bar -->
+      <div class="tab-bar">
+        <button class="tab-btn active" id="tabTimer" onclick="switchTab('timer')">⏱ 타이머</button>
+        <button class="tab-btn" id="tabHistory" onclick="switchTab('history')">📋 기록</button>
+      </div>
+
+      <!-- ── Timer Tab ── -->
+      <div id="timerTab">
+        <div class="input-section" id="inputSection">
+          <div class="input-row">
+            <span class="input-label">📚 공부</span>
+            <div class="time-input-group">
+              <input class="time-field" id="studyMin" type="number" min="0" max="99" value="25" inputmode="numeric" />
+              <span class="time-sep">:</span>
+              <input class="time-field" id="studySec" type="number" min="0" max="59" value="00" inputmode="numeric" />
+              <span class="time-unit">mm:ss</span>
+            </div>
+          </div>
+          <div class="input-row">
+            <span class="input-label">🌙 휴식</span>
+            <div class="time-input-group">
+              <input class="time-field" id="restMin" type="number" min="0" max="99" value="05" inputmode="numeric" />
+              <span class="time-sep">:</span>
+              <input class="time-field" id="restSec" type="number" min="0" max="59" value="00" inputmode="numeric" />
+              <span class="time-unit">mm:ss</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timer-display">
+          <div class="timer-ring-wrap">
+            <svg class="timer-svg" viewBox="0 0 200 200">
+              <circle class="ring-track" cx="100" cy="100" r="90"/>
+              <circle class="ring-progress" id="ringProgress" cx="100" cy="100" r="90"/>
+            </svg>
+            <div class="timer-inner">
+              <div class="timer-digits" id="timerDigits">25:00</div>
+              <div class="timer-sub" id="timerSub">대기 중</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="btn-main" id="mainBtn" onclick="handleMain()">▶ 공부 시작</button>
+          <button class="btn-secondary" onclick="handleReset()">초기화</button>
         </div>
       </div>
-      <div class="input-row">
-        <span class="input-label">🌙 휴식</span>
-        <div class="time-input-group">
-          <input class="time-field" id="restMin" type="number" min="0" max="99" value="05" inputmode="numeric" />
-          <span class="time-sep">:</span>
-          <input class="time-field" id="restSec" type="number" min="0" max="59" value="00" inputmode="numeric" />
-          <span class="time-unit">mm:ss</span>
+
+      <!-- ── History Tab ── -->
+      <div id="historyTab">
+        <div class="history-header">
+          <div class="history-title">내 기록</div>
+          <button class="history-clear" onclick="clearHistory()">전체 삭제</button>
         </div>
-      </div>
-    </div>
 
-    <!-- Ring timer -->
-    <div class="timer-display">
-      <div class="timer-ring-wrap">
-        <svg class="timer-svg" viewBox="0 0 220 220">
-          <circle class="ring-track" cx="110" cy="110" r="100"/>
-          <circle class="ring-progress" id="ringProgress" cx="110" cy="110" r="100"/>
-        </svg>
-        <div class="timer-inner">
-          <div class="timer-digits" id="timerDigits">25:00</div>
-          <div class="timer-sub" id="timerSub">대기 중</div>
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">📚 총 공부</div>
+            <div class="stat-value" id="statStudy">0</div>
+            <div class="stat-unit">분</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">🌙 총 휴식</div>
+            <div class="stat-value" id="statRest">0</div>
+            <div class="stat-unit">분</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">🔥 세션 수</div>
+            <div class="stat-value" id="statCount">0</div>
+            <div class="stat-unit">회</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">📅 오늘 공부</div>
+            <div class="stat-value" id="statToday">0</div>
+            <div class="stat-unit">분</div>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Controls -->
-    <div class="controls">
-      <button class="btn-main" id="mainBtn" onclick="handleMain()">▶ 공부 시작</button>
-      <button class="btn-secondary" id="resetBtn" onclick="handleReset()">초기화</button>
-    </div>
-
-    <!-- Session log -->
-    <div class="session-log">
-      <div class="log-title">오늘의 기록</div>
-      <div id="logList">
-        <div class="log-empty">아직 기록이 없어요</div>
+        <div id="historyList"></div>
       </div>
+
     </div>
   </div>
 
@@ -548,254 +682,396 @@
       <div class="choice-sub" id="choiceSub">다음 세션을 선택하세요</div>
       <div class="choice-buttons">
         <button class="choice-btn study" onclick="chooseSession('study')">
-          <span class="choice-icon">📚</span>
-          <span>공부</span>
+          <span class="choice-icon">📚</span><span>공부</span>
         </button>
         <button class="choice-btn rest" onclick="chooseSession('rest')">
-          <span class="choice-icon">🌙</span>
-          <span>휴식</span>
+          <span class="choice-icon">🌙</span><span>휴식</span>
         </button>
       </div>
     </div>
   </div>
 
-  <script>
-    // ─── State ───────────────────────────────────────────────
-    let totalSeconds = 0;
-    let remainingSeconds = 0;
-    let intervalId = null;
-    let isRunning = false;
-    let currentMode = 'study'; // 'study' | 'rest'
-    let sessionLog = [];
-    let sessionStartTime = null;
+<script>
+// ══════════════════════════════════════════
+//  STORAGE HELPERS
+// ══════════════════════════════════════════
+const USERS_KEY = 'focusTimer_users';       // { userId: [logs] }
+const RECENT_KEY = 'focusTimer_recent';     // [userId, ...]
+const MAX_RECENT = 5;
 
-    const CIRCUMFERENCE = 2 * Math.PI * 100; // 628.3
+function getAllUsers() {
+  try { return JSON.parse(localStorage.getItem(USERS_KEY)) || {}; } catch { return {}; }
+}
 
-    // ─── DOM refs ────────────────────────────────────────────
-    const body = document.body;
-    const modeLabel = document.getElementById('modeLabel');
-    const timerDigits = document.getElementById('timerDigits');
-    const timerSub = document.getElementById('timerSub');
-    const ringProgress = document.getElementById('ringProgress');
-    const mainBtn = document.getElementById('mainBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const inputSection = document.getElementById('inputSection');
-    const choiceOverlay = document.getElementById('choiceOverlay');
-    const choiceSub = document.getElementById('choiceSub');
-    const logList = document.getElementById('logList');
+function saveAllUsers(data) {
+  localStorage.setItem(USERS_KEY, JSON.stringify(data));
+}
 
-    // ─── Init ────────────────────────────────────────────────
-    ringProgress.style.strokeDasharray = CIRCUMFERENCE;
-    ringProgress.style.strokeDashoffset = 0;
-    updateDigits(getInputSeconds('study'));
+function getUserLogs(uid) {
+  return getAllUsers()[uid] || [];
+}
 
-    function getInputSeconds(mode) {
-      const minEl = document.getElementById(mode === 'study' ? 'studyMin' : 'restMin');
-      const secEl = document.getElementById(mode === 'study' ? 'studySec' : 'restSec');
-      const m = Math.max(0, parseInt(minEl.value) || 0);
-      const s = Math.max(0, Math.min(59, parseInt(secEl.value) || 0));
-      return m * 60 + s;
+function saveUserLog(uid, logs) {
+  const all = getAllUsers();
+  all[uid] = logs;
+  saveAllUsers(all);
+}
+
+function getRecentUsers() {
+  try { return JSON.parse(localStorage.getItem(RECENT_KEY)) || []; } catch { return []; }
+}
+
+function pushRecentUser(uid) {
+  let list = getRecentUsers().filter(u => u !== uid);
+  list.unshift(uid);
+  if (list.length > MAX_RECENT) list = list.slice(0, MAX_RECENT);
+  localStorage.setItem(RECENT_KEY, JSON.stringify(list));
+}
+
+// ══════════════════════════════════════════
+//  LOGIN
+// ══════════════════════════════════════════
+let currentUser = null;
+let sessionLog = [];
+
+window.addEventListener('DOMContentLoaded', () => {
+  // Ring setup
+  const CIRC = 2 * Math.PI * 90;
+  ringProgress.style.strokeDasharray = CIRC;
+  ringProgress.style.strokeDashoffset = 0;
+  window._CIRC = CIRC;
+
+  updateDigits(getInputSeconds('study'));
+
+  // Show recent users
+  renderRecentChips();
+
+  // Enter key on input
+  document.getElementById('userInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+});
+
+function renderRecentChips() {
+  const recent = getRecentUsers();
+  const wrap = document.getElementById('recentWrap');
+  const list = document.getElementById('recentList');
+  if (recent.length === 0) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'flex';
+  list.innerHTML = recent.map(uid =>
+    `<div class="recent-chip" onclick="quickLogin('${uid.replace(/'/g,"\\'")}')">
+      ${uid}
+    </div>`
+  ).join('');
+}
+
+function quickLogin(uid) {
+  document.getElementById('userInput').value = uid;
+  handleLogin();
+}
+
+function handleLogin() {
+  const raw = document.getElementById('userInput').value.trim();
+  if (!raw) { document.getElementById('userInput').focus(); return; }
+  currentUser = raw;
+  pushRecentUser(currentUser);
+  sessionLog = getUserLogs(currentUser);
+
+  // Set UI
+  document.getElementById('userAvatar').textContent = currentUser.charAt(0).toUpperCase();
+  document.getElementById('userName').textContent = currentUser;
+
+  // Show app
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+
+  updateDigits(getInputSeconds('study'));
+  updateRing(getInputSeconds('study'), getInputSeconds('study'));
+}
+
+function handleLogout() {
+  if (isRunning) pauseTimer();
+  currentUser = null;
+  document.getElementById('userInput').value = '';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  renderRecentChips();
+  handleReset();
+}
+
+// ══════════════════════════════════════════
+//  TAB SWITCHING
+// ══════════════════════════════════════════
+function switchTab(tab) {
+  const timerTab = document.getElementById('timerTab');
+  const historyTab = document.getElementById('historyTab');
+  const tabTimer = document.getElementById('tabTimer');
+  const tabHistory = document.getElementById('tabHistory');
+
+  if (tab === 'timer') {
+    timerTab.style.display = 'flex';
+    historyTab.style.display = 'none';
+    tabTimer.classList.add('active');
+    tabHistory.classList.remove('active');
+  } else {
+    timerTab.style.display = 'none';
+    historyTab.style.display = 'flex';
+    tabTimer.classList.remove('active');
+    tabHistory.classList.add('active');
+    renderHistory();
+  }
+}
+
+// ══════════════════════════════════════════
+//  TIMER
+// ══════════════════════════════════════════
+let totalSeconds = 0;
+let remainingSeconds = 0;
+let intervalId = null;
+let isRunning = false;
+let currentMode = 'study';
+
+const body = document.body;
+const modeLabel = document.getElementById('modeLabel');
+const timerDigits = document.getElementById('timerDigits');
+const timerSub = document.getElementById('timerSub');
+const ringProgress = document.getElementById('ringProgress');
+const mainBtn = document.getElementById('mainBtn');
+const inputSection = document.getElementById('inputSection');
+const choiceOverlay = document.getElementById('choiceOverlay');
+const choiceSub = document.getElementById('choiceSub');
+
+['studyMin','studySec','restMin','restSec'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    if (!isRunning && currentMode === 'study') {
+      updateDigits(getInputSeconds('study'));
+      updateRing(getInputSeconds('study'), getInputSeconds('study'));
     }
+  });
+});
 
-    function updateDigits(secs) {
-      const m = Math.floor(secs / 60);
-      const s = secs % 60;
-      timerDigits.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+function getInputSeconds(mode) {
+  const minEl = document.getElementById(mode === 'study' ? 'studyMin' : 'restMin');
+  const secEl = document.getElementById(mode === 'study' ? 'studySec' : 'restSec');
+  const m = Math.max(0, parseInt(minEl.value) || 0);
+  const s = Math.max(0, Math.min(59, parseInt(secEl.value) || 0));
+  return m * 60 + s;
+}
+
+function updateDigits(secs) {
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  timerDigits.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function updateRing(remaining, total) {
+  const CIRC = window._CIRC || 565;
+  if (total === 0) { ringProgress.style.strokeDashoffset = 0; return; }
+  ringProgress.style.strokeDashoffset = CIRC * (1 - remaining / total);
+}
+
+function handleMain() {
+  if (!isRunning) {
+    if (remainingSeconds <= 0) {
+      totalSeconds = getInputSeconds(currentMode);
+      remainingSeconds = totalSeconds;
     }
+    startTimer();
+  } else {
+    pauseTimer();
+  }
+}
 
-    function updateRing(remaining, total) {
-      if (total === 0) { ringProgress.style.strokeDashoffset = 0; return; }
-      const offset = CIRCUMFERENCE * (1 - remaining / total);
-      ringProgress.style.strokeDashoffset = offset;
-    }
+function startTimer() {
+  if (remainingSeconds <= 0) {
+    totalSeconds = getInputSeconds(currentMode);
+    remainingSeconds = totalSeconds;
+  }
+  if (totalSeconds <= 0) {
+    totalSeconds = getInputSeconds(currentMode);
+    remainingSeconds = totalSeconds;
+  }
+  if (totalSeconds === 0) return;
 
-    // ─── Input sync ──────────────────────────────────────────
-    ['studyMin','studySec','restMin','restSec'].forEach(id => {
-      document.getElementById(id).addEventListener('input', () => {
-        if (!isRunning && currentMode === 'study') {
-          updateDigits(getInputSeconds('study'));
-          updateRing(getInputSeconds('study'), getInputSeconds('study'));
-        }
-      });
-    });
+  isRunning = true;
+  body.classList.add('running');
+  inputSection.style.opacity = '0.4';
+  inputSection.style.pointerEvents = 'none';
+  mainBtn.textContent = '⏸ 일시정지';
+  timerSub.textContent = currentMode === 'study' ? '집중 중...' : '휴식 중...';
 
-    // ─── Main button ─────────────────────────────────────────
-    function handleMain() {
-      if (!isRunning) {
-        startTimer();
-      } else {
-        pauseTimer();
-      }
-    }
-
-    function startTimer() {
-      if (remainingSeconds === 0 || remainingSeconds === totalSeconds && totalSeconds === 0) {
-        totalSeconds = getInputSeconds(currentMode);
-        remainingSeconds = totalSeconds;
-      }
-      if (remainingSeconds <= 0) {
-        totalSeconds = getInputSeconds(currentMode);
-        remainingSeconds = totalSeconds;
-      }
-      if (totalSeconds === 0) return;
-
-      isRunning = true;
-      sessionStartTime = sessionStartTime || new Date();
-      body.classList.add('running');
-      inputSection.style.opacity = '0.4';
-      inputSection.style.pointerEvents = 'none';
-
-      mainBtn.textContent = '⏸ 일시정지';
-      timerSub.textContent = currentMode === 'study' ? '집중 중...' : '휴식 중...';
-
-      intervalId = setInterval(() => {
-        remainingSeconds--;
-        updateDigits(remainingSeconds);
-        updateRing(remainingSeconds, totalSeconds);
-
-        if (remainingSeconds <= 0) {
-          clearInterval(intervalId);
-          intervalId = null;
-          isRunning = false;
-          body.classList.remove('running');
-          onTimerEnd();
-        }
-      }, 1000);
-    }
-
-    function pauseTimer() {
-      clearInterval(intervalId);
-      intervalId = null;
+  intervalId = setInterval(() => {
+    remainingSeconds--;
+    updateDigits(remainingSeconds);
+    updateRing(remainingSeconds, totalSeconds);
+    if (remainingSeconds <= 0) {
+      clearInterval(intervalId); intervalId = null;
       isRunning = false;
       body.classList.remove('running');
-      mainBtn.textContent = '▶ 계속하기';
-      timerSub.textContent = '일시정지';
+      onTimerEnd();
     }
+  }, 1000);
+}
 
-    function onTimerEnd() {
-      // Vibrate on iOS (won't work on all, but attempt)
-      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+function pauseTimer() {
+  clearInterval(intervalId); intervalId = null;
+  isRunning = false;
+  body.classList.remove('running');
+  mainBtn.textContent = '▶ 계속하기';
+  timerSub.textContent = '일시정지';
+}
 
-      // Log the session
-      addLog(currentMode, totalSeconds);
+function onTimerEnd() {
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+  addLog(currentMode, totalSeconds);
+  mainBtn.textContent = '선택 중...';
+  timerSub.textContent = '종료!';
+  choiceSub.textContent = currentMode === 'study' ? '공부 완료! 다음은?' : '휴식 완료! 다음은?';
+  setTimeout(() => choiceOverlay.classList.add('visible'), 300);
+}
 
-      mainBtn.textContent = '선택 중...';
-      timerSub.textContent = '종료!';
+function chooseSession(mode) {
+  choiceOverlay.classList.remove('visible');
+  setTimeout(() => {
+    currentMode = mode;
+    applyMode(mode);
+    totalSeconds = getInputSeconds(mode);
+    remainingSeconds = totalSeconds;
+    updateDigits(remainingSeconds);
+    updateRing(remainingSeconds, totalSeconds);
+    inputSection.style.opacity = '1';
+    inputSection.style.pointerEvents = 'auto';
+    mainBtn.textContent = mode === 'study' ? '▶ 공부 시작' : '▶ 휴식 시작';
+    timerSub.textContent = '대기 중';
+    startTimer();
+  }, 300);
+}
 
-      // Show choice overlay
-      const label = currentMode === 'study' ? '공부 완료! 다음은?' : '휴식 완료! 다음은?';
-      choiceSub.textContent = label;
-      setTimeout(() => {
-        choiceOverlay.classList.add('visible');
-      }, 300);
-    }
+function applyMode(mode) {
+  if (mode === 'rest') {
+    body.classList.add('rest-mode');
+    modeLabel.textContent = '휴식 모드';
+  } else {
+    body.classList.remove('rest-mode');
+    modeLabel.textContent = '공부 모드';
+  }
+}
 
-    function chooseSession(mode) {
-      choiceOverlay.classList.remove('visible');
+function handleReset() {
+  clearInterval(intervalId); intervalId = null;
+  isRunning = false; currentMode = 'study';
+  body.classList.remove('running', 'rest-mode');
+  applyMode('study');
+  choiceOverlay.classList.remove('visible');
+  totalSeconds = getInputSeconds('study');
+  remainingSeconds = totalSeconds;
+  updateDigits(remainingSeconds);
+  updateRing(remainingSeconds, totalSeconds);
+  inputSection.style.opacity = '1';
+  inputSection.style.pointerEvents = 'auto';
+  mainBtn.textContent = '▶ 공부 시작';
+  timerSub.textContent = '대기 중';
+}
 
-      setTimeout(() => {
-        currentMode = mode;
-        applyMode(mode);
+// ══════════════════════════════════════════
+//  LOG & HISTORY
+// ══════════════════════════════════════════
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
 
-        totalSeconds = getInputSeconds(mode);
-        remainingSeconds = totalSeconds;
-        sessionStartTime = null;
+function addLog(mode, secs) {
+  if (!currentUser) return;
+  const now = new Date();
+  const entry = {
+    mode,
+    secs,
+    date: todayStr(),
+    time: `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`,
+    ts: now.getTime()
+  };
+  sessionLog.unshift(entry);
+  saveUserLog(currentUser, sessionLog);
+}
 
-        updateDigits(remainingSeconds);
-        updateRing(remainingSeconds, totalSeconds);
+function clearHistory() {
+  if (!currentUser) return;
+  if (!confirm('전체 기록을 삭제할까요?')) return;
+  sessionLog = [];
+  saveUserLog(currentUser, []);
+  renderHistory();
+}
 
-        inputSection.style.opacity = '1';
-        inputSection.style.pointerEvents = 'auto';
+function fmtSecs(s) {
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return r > 0 ? `${m}분 ${r}초` : `${m}분`;
+}
 
-        mainBtn.textContent = mode === 'study' ? '▶ 공부 시작' : '▶ 휴식 시작';
-        timerSub.textContent = '대기 중';
+function renderHistory() {
+  // Stats
+  const studyTotal = sessionLog.filter(e => e.mode === 'study').reduce((a, e) => a + e.secs, 0);
+  const restTotal  = sessionLog.filter(e => e.mode === 'rest' ).reduce((a, e) => a + e.secs, 0);
+  const today = todayStr();
+  const todayStudy = sessionLog.filter(e => e.mode === 'study' && e.date === today).reduce((a, e) => a + e.secs, 0);
 
-        // Auto-start
-        startTimer();
-      }, 300);
-    }
+  document.getElementById('statStudy').textContent = Math.floor(studyTotal / 60);
+  document.getElementById('statRest').textContent  = Math.floor(restTotal / 60);
+  document.getElementById('statCount').textContent = sessionLog.length;
+  document.getElementById('statToday').textContent = Math.floor(todayStudy / 60);
 
-    function applyMode(mode) {
-      if (mode === 'rest') {
-        body.classList.add('rest-mode');
-        modeLabel.textContent = '휴식 모드';
-      } else {
-        body.classList.remove('rest-mode');
-        modeLabel.textContent = '공부 모드';
-      }
-    }
+  const container = document.getElementById('historyList');
+  if (sessionLog.length === 0) {
+    container.innerHTML = '<div class="history-empty">아직 기록이 없어요<br>타이머를 시작해보세요 ⏱</div>';
+    return;
+  }
 
-    function handleReset() {
-      clearInterval(intervalId);
-      intervalId = null;
-      isRunning = false;
-      currentMode = 'study';
-      sessionStartTime = null;
+  // Group by date
+  const groups = {};
+  sessionLog.forEach(e => {
+    if (!groups[e.date]) groups[e.date] = [];
+    groups[e.date].push(e);
+  });
 
-      body.classList.remove('running', 'rest-mode');
-      applyMode('study');
-      choiceOverlay.classList.remove('visible');
+  const dateLabels = { [todayStr()]: '오늘' };
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+  const yStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
+  dateLabels[yStr] = '어제';
 
-      totalSeconds = getInputSeconds('study');
-      remainingSeconds = totalSeconds;
-
-      updateDigits(remainingSeconds);
-      updateRing(remainingSeconds, totalSeconds);
-
-      inputSection.style.opacity = '1';
-      inputSection.style.pointerEvents = 'auto';
-
-      mainBtn.textContent = '▶ 공부 시작';
-      timerSub.textContent = '대기 중';
-    }
-
-    // ─── Session log ─────────────────────────────────────────
-    function addLog(mode, secs) {
-      const now = new Date();
-      const h = String(now.getHours()).padStart(2,'0');
-      const m = String(now.getMinutes()).padStart(2,'0');
-      const durMin = Math.floor(secs / 60);
-      const durSec = secs % 60;
-      const label = mode === 'study' ? '공부' : '휴식';
-      sessionLog.unshift({ mode, label, time: `${h}:${m}`, duration: `${durMin}분 ${durSec > 0 ? durSec + '초' : ''}` });
-      renderLog();
-    }
-
-    function renderLog() {
-      if (sessionLog.length === 0) {
-        logList.innerHTML = '<div class="log-empty">아직 기록이 없어요</div>';
-        return;
-      }
-      logList.innerHTML = sessionLog.map(item => `
-        <div class="log-item">
-          <div class="log-left">
-            <div class="log-dot ${item.mode}"></div>
-            <span>${item.label} · ${item.duration.trim()}</span>
+  container.innerHTML = Object.keys(groups).map(date => {
+    const label = dateLabels[date] || date;
+    const items = groups[date].map(e => `
+      <div class="log-card">
+        <div class="log-left">
+          <div class="log-dot ${e.mode}"></div>
+          <div class="log-info">
+            <div class="log-type">${e.mode === 'study' ? '📚 공부' : '🌙 휴식'}</div>
+            <div class="log-dur">${fmtSecs(e.secs)}</div>
           </div>
-          <span>${item.time}</span>
         </div>
-      `).join('');
-    }
+        <div class="log-time">${e.time}</div>
+      </div>
+    `).join('');
+    return `<div class="date-group"><div class="date-label">${label}</div>${items}</div>`;
+  }).join('');
+}
 
-    // ─── Prevent sleep on iOS (best effort) ──────────────────
-    // iOS doesn't allow true wake lock, but we keep a dummy audio context
-    let audioCtx = null;
-    function keepAwake() {
-      try {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-        gainNode.gain.value = 0; // silent
-        oscillator.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-        oscillator.start();
-      } catch(e) {}
-    }
-
-    // Trigger on first touch
-    document.addEventListener('touchstart', () => {
-      if (!audioCtx) keepAwake();
-    }, { once: true });
-  </script>
+// ══════════════════════════════════════════
+//  WAKE LOCK (best-effort iOS)
+// ══════════════════════════════════════════
+let audioCtx = null;
+document.addEventListener('touchstart', () => {
+  if (audioCtx) return;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    gain.gain.value = 0;
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start();
+  } catch(e) {}
+}, { once: true });
+</script>
 </body>
 </html>
